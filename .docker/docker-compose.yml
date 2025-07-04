@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=credit_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+
+  training:
+    build:
+      context: .
+      dockerfile: .docker/training.Dockerfile
+    volumes:
+      - model-data:/app/model
+    depends_on:
+      - db
+
+
+  app:
+    build:
+      context: .
+      dockerfile: .docker/app.Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/credit_db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - MODEL_PATH=/app/model/credit_scoring_model.bin
+    volumes:
+      - model-data:/app/model:ro
+    depends_on:
+      training:
+        condition: service_completed_successfully
+
+
+volumes:
+  db-data:
+  model-data:
