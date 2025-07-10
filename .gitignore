@@ -18,6 +18,8 @@
 *.zip
 *.tar.gz
 *.rar
+src/main/resources/data/
+src/main/resources/model/
 application-dev.properties
 
 ### Virtual Machine Crash Logs ###
